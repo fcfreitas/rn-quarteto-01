@@ -58,6 +58,9 @@ export default function DashboardPage() {
     const res = await fetch('/api/race/start', { method: 'POST' })
     if (res.ok) {
       await fetchData()
+    } else {
+      const json = await res.json().catch(() => ({}))
+      alert(`Erro ao iniciar prova: ${json.error ?? res.status}`)
     }
   }
 
@@ -65,6 +68,9 @@ export default function DashboardPage() {
     const res = await fetch('/api/race/start', { method: 'DELETE' })
     if (res.ok) {
       await fetchData()
+    } else {
+      const json = await res.json().catch(() => ({}))
+      alert(`Erro ao resetar: ${json.error ?? res.status}`)
     }
   }
 
