@@ -12,7 +12,11 @@ interface ApiResponse {
   raceConfig: RaceConfig
 }
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json())
+const fetcher = (url: string) =>
+  fetch(`${url}?_t=${Date.now()}`, {
+    cache: 'no-store',
+    headers: { 'Cache-Control': 'no-cache' },
+  }).then((r) => r.json())
 
 export default function PublicPage() {
   const { data, error, isLoading } = useSWR<ApiResponse>('/api/segments', fetcher, {

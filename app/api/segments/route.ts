@@ -25,8 +25,17 @@ export async function GET() {
     return NextResponse.json({ error: configError.message }, { status: 500 })
   }
 
-  return NextResponse.json({
-    segments: segments as Segment[],
-    raceConfig: raceConfig ?? { id: 1, start_time: null, is_started: false },
-  })
+  return NextResponse.json(
+    {
+      segments: segments as Segment[],
+      raceConfig: raceConfig ?? { id: 1, start_time: null, is_started: false },
+    },
+    {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
+    }
+  )
 }

@@ -36,7 +36,10 @@ export default function DashboardPage() {
   }, [status, router])
 
   const fetchData = useCallback(async () => {
-    const res = await fetch('/api/segments')
+    const res = await fetch(`/api/segments?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache' },
+    })
     if (res.ok) {
       const json = await res.json()
       setSegments(json.segments)
