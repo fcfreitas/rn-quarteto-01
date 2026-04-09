@@ -21,14 +21,16 @@ function toLocalTimeInput(isoString: string | null): string {
 }
 
 function parseTimeInput(timeStr: string): Date {
-  // Parses HH:MM:SS and returns a Date for today (race day) in Sao Paulo timezone
+  // Parses HH:MM:SS usando a data de HOJE em horário de Brasília (UTC-3).
+  // Funciona tanto no modo teste (hoje) quanto no dia da prova (11/04).
   const [h, m, s] = timeStr.split(':').map(Number)
-  // Use race date 2026-04-11
-  const raceDate = new Date('2026-04-11T00:00:00-03:00')
-  raceDate.setHours(h, m, s ?? 0, 0)
-  // Re-construct in BRT
-  const iso = `2026-04-11T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s ?? 0).padStart(2,'0')}-03:00`
-  return new Date(iso)
+  const brtNow = new Date(Date.now() - 3 * 60 * 60 * 1000) // UTC-3
+  const year = brtNow.getUTCFullYear()
+  const month = String(brtNow.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(brtNow.getUTCDate()).padStart(2, '0')
+  return new Date(
+    `${year}-${month}-${day}T${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s ?? 0).padStart(2,'0')}-03:00`
+  )
 }
 
 interface RowProps {

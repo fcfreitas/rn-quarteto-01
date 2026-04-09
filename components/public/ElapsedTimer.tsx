@@ -4,9 +4,17 @@ import { useEffect, useState } from 'react'
 
 interface ElapsedTimerProps {
   startTime: string
+  label?: string
+  size?: 'sm' | 'lg'
+  color?: string
 }
 
-export default function ElapsedTimer({ startTime }: ElapsedTimerProps) {
+export default function ElapsedTimer({
+  startTime,
+  label = 'Tempo decorrido',
+  size = 'lg',
+  color = 'var(--color-warning)',
+}: ElapsedTimerProps) {
   const [elapsed, setElapsed] = useState('')
 
   useEffect(() => {
@@ -33,12 +41,15 @@ export default function ElapsedTimer({ startTime }: ElapsedTimerProps) {
 
   return (
     <div className="flex flex-col items-center">
-      <span className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--color-text-muted)' }}>
-        Tempo decorrido
+      <span
+        className="text-xs font-medium uppercase tracking-widest"
+        style={{ color: 'var(--color-text-muted)' }}
+      >
+        {label}
       </span>
       <span
-        className="text-4xl font-mono font-bold tabular-nums mt-1"
-        style={{ color: 'var(--color-warning)' }}
+        className={`font-mono font-bold tabular-nums mt-1 ${size === 'lg' ? 'text-4xl' : 'text-2xl'}`}
+        style={{ color }}
       >
         {elapsed}
       </span>

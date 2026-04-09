@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { createServiceClient } from '@/lib/supabase'
 
+export const dynamic = 'force-dynamic'
+
 function isAdmin(email: string | null | undefined): boolean {
   return email === process.env.NEXT_PUBLIC_ADMIN_EMAIL
 }
@@ -14,16 +16,28 @@ export async function POST(req: Request) {
   }
 
   const supabase = createServiceClient()
+  const startTime = new Date().toISOString()
 
-  const { error } = await supabase
+  // Salva horário de largada
+  const { error: configError } = await supabase
     .from('race_config')
-    .upsert({ id: 1, start_time: new Date().toISOString(), is_started: true })
+    .upsert({ id: 1, start_time: startTime, is_started: true })
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+  if (configError) {
+    return NextResponse.json({ error: configError.message }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true })
+  // Seta actual_start_time do primeiro trecho = horário de largada
+  const { error: segError } = await supabase
+    .from('segments')
+    .update({ actual_start_time: startTime })
+    .eq('segment_number', 1)
+
+  if (segError) {
+    return NextResponse.json({ error: segError.message }, { status: 500 })
+  }
+
+  return NextResponse.json({ ok: true, start_time: startTime })
 }
 
 export async function DELETE(req: Request) {
@@ -34,7 +48,6 @@ export async function DELETE(req: Request) {
 
   const supabase = createServiceClient()
 
-  // Reset race_config
   const { error: configError } = await supabase
     .from('race_config')
     .upsert({ id: 1, start_time: null, is_started: false })
@@ -43,7 +56,6 @@ export async function DELETE(req: Request) {
     return NextResponse.json({ error: configError.message }, { status: 500 })
   }
 
-  // Reset all segment actual times
   const { error: segError } = await supabase
     .from('segments')
     .update({ actual_start_time: null, actual_finish_time: null })

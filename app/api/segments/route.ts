@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 import type { Segment } from '@/types/race'
 
+// Nunca cachear — dados mudam em tempo real durante a prova
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   const { data: segments, error: segError } = await supabase
     .from('segments')
