@@ -40,7 +40,7 @@ function StatusBadge({ status }: { status: SegmentWithProjection['status'] }) {
 export default function SegmentsTable({ projections }: SegmentsTableProps) {
   return (
     <div className="w-full overflow-x-auto rounded-xl" style={{ border: '1px solid var(--color-primary-mid)' }}>
-      <table className="w-full min-w-[700px] border-collapse text-sm">
+      <table className="w-full min-w-[820px] border-collapse text-sm">
         <thead>
           <tr style={{ background: 'var(--color-primary-dark)' }}>
             <th className="px-3 py-3 text-left font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>#</th>
@@ -49,7 +49,12 @@ export default function SegmentsTable({ projections }: SegmentsTableProps) {
             <th className="px-3 py-3 text-right font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Km</th>
             <th className="px-3 py-3 text-center font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Largada</th>
             <th className="px-3 py-3 text-center font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Chegada</th>
-            <th className="px-3 py-3 text-center font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Pace</th>
+            <th className="px-3 py-3 text-center font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
+              Pace previsto
+            </th>
+            <th className="px-3 py-3 text-center font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>
+              Pace realizado
+            </th>
             <th className="px-3 py-3 text-center font-semibold text-xs uppercase tracking-wider" style={{ color: 'var(--color-text-muted)' }}>Status</th>
           </tr>
         </thead>
@@ -75,12 +80,11 @@ export default function SegmentsTable({ projections }: SegmentsTableProps) {
             const startIsActual = !!seg.actual_start_time
             const finishIsActual = !!seg.actual_finish_time
 
-            const pace =
-              seg.actual_pace_seconds_per_km !== null
-                ? formatPace(seg.actual_pace_seconds_per_km)
-                : seg.status === 'previsto'
-                ? formatPace(seg.projected_pace_seconds_per_km)
-                : formatPace(seg.projected_pace_seconds_per_km)
+            // Pace previsto: sempre calculado a partir da estimativa original
+            const plannedPace = seg.estimated_duration_seconds / Number(seg.distance_km)
+
+            // Pace realizado: apenas quando concluído com tempos reais
+            const actualPace = seg.actual_pace_seconds_per_km
 
             return (
               <tr
@@ -121,8 +125,19 @@ export default function SegmentsTable({ projections }: SegmentsTableProps) {
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-3 text-center font-mono text-xs whitespace-nowrap" style={{ color: isDone ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
-                  {pace}
+                {/* Pace previsto — sempre visível */}
+                <td className="px-3 py-3 text-center font-mono text-xs whitespace-nowrap" style={{ color: 'var(--color-text-muted)' }}>
+                  {formatPace(plannedPace)}
+                </td>
+                {/* Pace realizado — só para trechos concluídos */}
+                <td className="px-3 py-3 text-center font-mono text-xs whitespace-nowrap">
+                  {actualPace !== null ? (
+                    <span style={{ color: actualPace <= plannedPace ? 'var(--color-success)' : 'var(--color-warning)' }}>
+                      {formatPace(actualPace)}
+                    </span>
+                  ) : (
+                    <span style={{ color: 'rgba(196,168,232,0.3)' }}>—</span>
+                  )}
                 </td>
                 <td className="px-3 py-3 text-center">
                   <StatusBadge status={seg.status} />
@@ -137,7 +152,7 @@ export default function SegmentsTable({ projections }: SegmentsTableProps) {
               Total
             </td>
             <td className="px-3 py-3 text-right font-mono font-bold text-white">148,9</td>
-            <td colSpan={4} />
+            <td colSpan={5} />
           </tr>
         </tfoot>
       </table>
