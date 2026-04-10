@@ -151,7 +151,7 @@ export default function SegmentsTable({ projections }: SegmentsTableProps) {
             <td colSpan={3} className="px-3 py-3 font-semibold text-sm" style={{ color: 'var(--color-text-muted)' }}>
               Total
             </td>
-            <td className="px-3 py-3 text-right font-mono font-bold text-white">148,9</td>
+            <td className="px-3 py-3 text-right font-mono font-bold text-white">140</td>
             <td colSpan={5} />
           </tr>
         </tfoot>

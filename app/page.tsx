@@ -75,7 +75,7 @@ export default function PublicPage() {
           <div className="flex flex-wrap items-center justify-center gap-4 mt-5">
             <InfoChip label="Data" value="11/04/2026" />
             <InfoChip label="Largada prevista" value="06:10 BRT" />
-            <InfoChip label="Distância total" value="148,9 km" />
+            <InfoChip label="Distância total" value="140 km" />
             <InfoChip label="Trechos" value="19" />
           </div>
         </div>
