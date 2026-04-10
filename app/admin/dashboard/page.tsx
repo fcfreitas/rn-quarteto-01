@@ -130,6 +130,10 @@ export default function DashboardPage() {
   }
 
   const projections = calculateProjections(segments, raceConfig.is_started)
+  const allFinished = projections.length > 0 && projections.every((s) => s.status === 'concluido')
+  const finishTime = allFinished
+    ? projections[projections.length - 1].actual_finish_time
+    : null
 
   return (
     <main className="min-h-screen pb-12" style={{ background: 'var(--color-bg)' }}>
@@ -195,9 +199,17 @@ export default function DashboardPage() {
             {raceConfig.is_started && raceConfig.start_time && (
               <div
                 className="rounded-xl p-5 flex items-center justify-center"
-                style={{ background: 'var(--color-surface)', border: '1px solid var(--color-primary-mid)' }}
+                style={{
+                  background: 'var(--color-surface)',
+                  border: `1px solid ${allFinished ? 'var(--color-success)' : 'var(--color-primary-mid)'}`,
+                }}
               >
-                <ElapsedTimer startTime={raceConfig.start_time} />
+                <ElapsedTimer
+                  startTime={raceConfig.start_time}
+                  endTime={finishTime}
+                  label={allFinished ? 'Tempo total de prova' : 'Tempo decorrido'}
+                  color={allFinished ? 'var(--color-success)' : 'var(--color-warning)'}
+                />
               </div>
             )}
           </div>
