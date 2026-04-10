@@ -1,11 +1,17 @@
 import { NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 import { createServiceClient } from '@/lib/supabase'
 import type { Segment } from '@/types/race'
 
-// Nunca cachear — dados mudam em tempo real durante a prova
+// Força renderização dinâmica — impede Static Generation no build
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function GET() {
+  // Chamar headers() é uma função dinâmica que garante
+  // que o Next.js nunca gere esta rota estaticamente
+  headers()
+
   const supabase = createServiceClient()
 
   const { data: segments, error: segError } = await supabase
